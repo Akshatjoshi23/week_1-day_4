@@ -1,102 +1,89 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-/**
- * Practice examples for iterators, collection choices, and common problems.
- *
- * Collection choice guide:
- * - ArrayList: O(1) indexed access; append is amortized O(1), middle insert/remove O(n).
- * - LinkedList: O(1) operations at either end; indexed access is O(n).
- * - HashSet / HashMap: average O(1) add, lookup, and remove; iteration is O(n).
- * - LinkedHashSet / LinkedHashMap: average O(1) lookup while preserving insertion order.
- * - TreeSet / TreeMap: O(log n) add, lookup, and remove with keys kept sorted.
- * - ArrayDeque: O(1) operations at either end; a good queue or stack choice.
- *
- * Hash-based complexity is average-case and depends on a reasonable hash distribution.
- */
 public class IteratorCollectionsPractice {
+
     public static void main(String[] args) {
-        List<Integer> numbers = new ArrayList<>(Arrays.asList(4, 1, 2, 4, 3, 2, 5, 6));
+
+        List<Integer> numbers = new ArrayList<>(
+                Arrays.asList(4, 1, 2, 4, 3, 2, 5, 6)
+        );
 
         System.out.println("Original numbers: " + numbers);
-        removeEvenNumbers(numbers);
-        System.out.println("After iterator removes evens: " + numbers);
 
-        List<Integer> problemInput = Arrays.asList(4, 1, 2, 4, 3, 2, 5, 6);
-        System.out.println("Frequency counts: " + countFrequencies(problemInput));
-        System.out.println("First duplicate: " + findFirstDuplicate(problemInput));
-        System.out.println("Unique in input order: " + uniqueInInputOrder(problemInput));
-        System.out.println("Pair adds to 11: " + hasPairWithSum(problemInput, 11));
+        removeEvenNumbers(numbers);
+        System.out.println("After removing even numbers: " + numbers);
+
+        List<Integer> input = Arrays.asList(4, 1, 2, 4, 3, 2, 5, 6);
+
+        System.out.println("Frequency of each number: " + countFrequencies(input));
+        System.out.println("First duplicate number: " + findFirstDuplicate(input));
+        System.out.println("Numbers without duplicates: " + uniqueNumbers(input));
+        System.out.println("Is there a pair with sum 11? " + hasPairWithSum(input, 11));
     }
 
-    /**
-     * Iterator.remove safely removes the current item during iteration.
-     * Time: O(n). Extra space: O(1).
-     */
+    // Removes even numbers using an Iterator.
     private static void removeEvenNumbers(List<Integer> numbers) {
         Iterator<Integer> iterator = numbers.iterator();
+
         while (iterator.hasNext()) {
-            if (iterator.next() % 2 == 0) {
+            int number = iterator.next();
+
+            if (number % 2 == 0) {
                 iterator.remove();
             }
         }
     }
 
-    /**
-     * Counts values with a map rather than repeatedly scanning the list.
-     * Time: O(n) average. Extra space: O(u), where u is the number of unique values.
-     */
+    // Counts how many times each number appears.
     private static Map<Integer, Integer> countFrequencies(List<Integer> numbers) {
-        Map<Integer, Integer> frequencies = new HashMap<>();
+        Map<Integer, Integer> frequencyMap = new HashMap<>();
+
         for (int number : numbers) {
-            frequencies.put(number, frequencies.getOrDefault(number, 0) + 1);
+            frequencyMap.put(
+                    number,
+                    frequencyMap.getOrDefault(number, 0) + 1
+            );
         }
-        return frequencies;
+
+        return frequencyMap;
     }
 
-    /**
-     * Returns the first value encountered for a second time, or null if none exists.
-     * Time: O(n) average. Extra space: O(u), where u is the number checked.
-     */
+    // Finds the first number that appears more than once.
     private static Integer findFirstDuplicate(List<Integer> numbers) {
-        Set<Integer> seen = new HashSet<>();
+        Set<Integer> seenNumbers = new HashSet<>();
+
         for (int number : numbers) {
-            if (!seen.add(number)) {
+            if (seenNumbers.contains(number)) {
                 return number;
             }
+
+            seenNumbers.add(number);
         }
-        return null;
+
+        return null; // No duplicate found.
     }
 
-    /**
-     * Removes duplicates while retaining their first-occurrence order.
-     * Time: O(n) average. Extra space: O(u), where u is the number of unique values.
-     */
-    private static List<Integer> uniqueInInputOrder(List<Integer> numbers) {
-        return new ArrayList<>(new LinkedHashSet<>(numbers));
+    // Returns unique numbers while keeping their original order.
+    private static List<Integer> uniqueNumbers(List<Integer> numbers) {
+        Set<Integer> uniqueSet = new LinkedHashSet<>(numbers);
+
+        return new ArrayList<>(uniqueSet);
     }
 
-    /**
-     * Checks whether two distinct positions contain values that sum to target.
-     * Time: O(n) average. Extra space: O(n).
-     */
+    // Checks whether any two different positions add up to the target.
     private static boolean hasPairWithSum(List<Integer> numbers, int target) {
-        Set<Integer> seen = new HashSet<>();
+        Set<Integer> seenNumbers = new HashSet<>();
+
         for (int number : numbers) {
-            long complement = (long) target - number;
-            if (complement >= Integer.MIN_VALUE && complement <= Integer.MAX_VALUE
-                    && seen.contains((int) complement)) {
+            int complement = target - number;
+
+            if (seenNumbers.contains(complement)) {
                 return true;
             }
-            seen.add(number);
+
+            seenNumbers.add(number);
         }
+
         return false;
     }
 }
